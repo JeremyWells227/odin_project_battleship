@@ -1,4 +1,15 @@
 import "./reset.css"
 import "./style.css"
+const Game = require("./game")
 
-console.log("Hello World")
+
+
+
+
+function initGame(){
+	let game = new Game
+	
+
+}
+
+let game = initGame
