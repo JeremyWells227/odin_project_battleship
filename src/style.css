@@ -1,0 +1,170 @@
+root{ 
+	--cell-size: 10%;
+}
+body {
+
+}
+body h1 {
+	font-family: Roboto Mono, monospace;
+	text-align: center;
+	font-size: 7em;
+	align-self: center;
+
+}
+
+.container {
+	align-self: center;
+	min-width: 55%;
+	min-height: 500px;
+	height: 40%;
+	display: flex;
+	gap: 10px;
+	justify-content: space-evenly;
+	background-color: #ddd
+}
+
+.player {
+	height: 40%;
+	width: 50%;
+	max-width: 1000px;
+	background-color: #eee;
+	box-shadow: 0px 0px 1em 1em #eee ;
+}
+
+.messagebox{
+	margin: auto;
+	margin-top: 10em;
+	width: 70%;
+	height: 400px;
+	background-color: teal;
+	border-radius: 25px;
+}
+.messagebox p{
+	text-align: center;
+	text-justify: center;
+	width: 80%;
+	font-size: 4em;
+	color: #eee;
+}
+
+
+
+
+.board{
+	display: grid;
+	margin: auto;
+	width: 80%;
+	height: 40%;
+	max-height: 750px;
+	max-width: 750px;
+	gap: 0;
+}
+.menu{
+	margin: auto;
+	margin-top: 5em;
+	min-width: 20px;
+	width: 20%;
+	max-width: 500px;
+	min-height: 140px;
+	border-radius: 50px;
+	max-width: 500px;
+	background-color: #0a85dd;
+
+	display: flex;
+	justify-content: space-around;
+	align-content: center;
+}
+
+.menu ul{
+	margin: auto;
+}
+
+
+
+.menu ul li button {
+  background-color: #0095ff;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  box-shadow: rgba(255, 255, 255, .4) 0 1px 0 0 inset;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Roboto Mono,'Courier New', Courier, monospace;
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.15385;
+  margin: 0;
+  outline: none;
+  padding: 8px .8em;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.menu ul li button:hover,
+.menu ul li button:focus {
+  background-color: #07c;
+}
+
+.menu ul li button:focus {
+  box-shadow: 0 0 0 4px rgba(0, 149, 255, .15);
+}
+
+.menu ul li button:active {
+  background-color: #0064bd;
+  box-shadow: none;
+}
+
+
+.cell {
+	margin: 0;
+	padding: 0;
+	min-width: 10%;
+	max-width: 75px;
+	aspect-ratio: 1/1;
+	border: 1px solid black;
+	background-color: white;
+	transition: all 100ms ease-in-out;
+	font-size: 2.5em;
+	text-align: center;
+	text-justify: center;
+}
+
+.cell:hover {
+	background-color: #ccc;
+}
+
+.filled-cell {
+	background-color: #333;
+}
+
+.attacked-empty-cell {
+	background-color: #aaa;
+}
+
+.attacked-filled-cell {
+	background-color: #333;
+	color: red;
+}
+
+
+
+
+
+.label-cell {
+	margin: 0;
+	padding: 0;
+	aspect-ratio: 1/1;
+	font-size: 2em;
+	min-width: 50px;
+	background-color: gray;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 50px;
+}

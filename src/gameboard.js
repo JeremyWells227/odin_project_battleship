@@ -2,12 +2,16 @@ const ATTACKED = "attacked";
 const FILLED = "filled";
 const EMPTY = "empty";
 
+const { renderMessage } = require('./dom.js');
 const Ship = require('./ship.js');
 const ShipFactory = require('./shipFactory.js');
 
+
 class GameBoard {
-	constructor(size = 10) {
+	constructor(size,player) {
 		this._generateGrid(size)
+		this.player=player
+		this.visible = false
 	}
 
 	_generateGrid(size) {
@@ -17,7 +21,7 @@ class GameBoard {
 		for (let row = 0; row < size; row++) {
 			this.grid[row] = []
 			for (let col = 0; col < size; col++) {
-				this.grid[row][col] = new Cell(row, col)
+				this.grid[row][col] = new Cell(row, col,this)
 			}
 		}
 		for (let row = 0; row < size; row++) {
@@ -27,20 +31,32 @@ class GameBoard {
 		}
 	}
 
+	onCellClick(e){
+		let cellid = e.target.id
+		if(!this.player.active){
+			let success = this.receiveAttack(cellid)
+			let attackedCell = this.getCell(cellid)
+			let didHit = (attackedCell.ship !== null)
+
+			if(!success || !didHit){
+				this.player.game.swapPlayer();
+			}
+			setTimeout(()=>this.player.game.gameLoop(),500)
+		}
+	}
+
 	autoGenerateShips(){
 		let shipfactory = new ShipFactory
 		let ships = shipfactory.generateShips()
 		let directions = ["N","S","E","W"]
 		let numTries = 1000
 		let count = 0
-		console.log(ships)
 		while (ships.length > 0){
 			let try_row = Math.floor(Math.random()*this.size)
 			let try_col = Math.floor(Math.random()*this.size)
 			let try_coord = this.translateRowColToCoord(try_row,try_col)
 			let try_dir = directions[Math.floor(Math.random() * directions.length)]
-			console.log("Trying to place ship of size ", ships[0].length, `\n ${ships.length} left.`)
-			if(this.placeShip(try_coord,try_dir,ships[0])){
+			if(this.placeShip(try_coord,try_dir,ships[0],auto=true)){
 				ships.shift()
 			} 
 			count+=1
@@ -83,6 +99,11 @@ class GameBoard {
 	isValidCoords(row, col) {
 		return row >= 0 && row < this.size && col >= 0 && col < this.size
 	}
+
+	getCell(coord){
+		let [row,col] = this.translateCoords(coord)
+		return this.grid[row][col];
+	}
 	
 
 
@@ -124,7 +145,7 @@ class GameBoard {
 		}
 	}
 
-	placeShip(coord,direction,ship){
+	placeShip(coord,direction,ship,auto=false){
 		let [row, col] = this.translateCoords(coord)
 		if (!this.isValidCoords(row, col)) {
 			console.log(`placeShip: Invalid coordinates ${row} ${col}`)
@@ -141,6 +162,10 @@ class GameBoard {
 					console.log("Invalid Ship placement: Path already occupied")
 					return false
 				}
+				if (currCell.hasShipInNeighbor() && auto){
+					console.log("Not placing ships next to each other in auto mode")
+					return false
+				}
 				cellsToPlaceShip.push(currCell)
 				currCell = this.grid[row+rowOffset*i][col+colOffset*i] 
 			}
@@ -155,12 +180,30 @@ class GameBoard {
 	}
 
 	toggleVisible(){
+		this.visible=!this.visible
 		for (let row = 0; row < this.size; row++) {
 			for (let col = 0; col < this.size; col++) {
 				this.grid[row][col].visible = !this.grid[row][col].visible 
 			}
 		}
 	}
+	setVisible(isVisible){
+		this.visible = isVisible
+		for (let row = 0; row < this.size; row++) {
+			for (let col = 0; col < this.size; col++) {
+				this.grid[row][col].visible = isVisible
+			}
+		}
+	}
+
+	sinkAll(){
+		for (let i=0; i<this.size; i++){
+			for (let j=0; j<this.size; j++){
+				this.receiveAttack(this.translateRowColToCoord(i,j))
+			}
+		}
+	}
+
 
 
 	receiveAttack(coord) {
@@ -176,7 +219,11 @@ class GameBoard {
 				console.log(`receiveAttack:  ${row} ${col} have already been attacked`);
 				return false;
 		}
+		let isMiss = "Missed"
 		cell.attack()
+		if (cell.ship)
+			isMiss = "Hit"
+		renderMessage(`Attack on ${coord} ${isMiss}`)
 		if (cell.ship!== null && cell.ship.isSunk()){
 			this.numShips -=1
 		}
@@ -206,10 +253,10 @@ class Cell {
 	// attacked
 	// Empty and filled states can be attacked.
 	// Cell cannot be attacked twice.
-	constructor(row, col) {
+	constructor(row, col,board) {
 		this.row = row
 		this.col = col
-		this.state = 'empty'
+		this.board = board
 		this.attacked = false
 		this.neighbors = []
 		this.ship = null
@@ -233,6 +280,10 @@ class Cell {
 				return "O"
 			}
 		}
+	}
+
+	hasShipInNeighbor(){
+		return this.neighbors.some((e) => e.ship !== null )
 	}
 
 

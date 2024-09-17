@@ -1,6 +1,8 @@
 import "./reset.css"
 import "./style.css"
-const Game = require("./game")
+import { Game} from "./game.js"
+import {initPage,renderMenu} from "./dom.js"
+
 
 
 
@@ -8,8 +10,7 @@ const Game = require("./game")
 
 function initGame(){
 	let game = new Game
-	
-
+	initPage(game)
 }
 
-let game = initGame
+initGame()
