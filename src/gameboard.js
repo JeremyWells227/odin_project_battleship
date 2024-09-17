@@ -5,6 +5,7 @@ const EMPTY = "empty";
 const { renderMessage } = require('./dom.js');
 const Ship = require('./ship.js');
 const ShipFactory = require('./shipFactory.js');
+import { GAMESTATES } from './game.js';
 
 
 class GameBoard {
@@ -31,11 +32,40 @@ class GameBoard {
 		}
 	}
 
+	getRandomDirectionalOffset(){
+		let directions = ["N","S","E","W"]
+		let try_dir = directions[Math.floor(Math.random() * directions.length)]
+		let offset = this._getDirectionalOffset(try_dir)
+		return offset
+	}
+	
+	getRandomUnattackedCell(){
+		let found = false;
+		let max_count = this.size * this.size
+		let i = 0;
+		let try_coord;
+		while (!found){
+			if(i === max_count){
+				console.log("Error: Unable to find a random unattacked cell")
+				return null
+			}
+			let try_row = Math.floor(Math.random()* this.size)
+			let try_col = Math.floor(Math.random()* this.size)
+			try_coord = this.translateRowColToCoord(try_row,try_col)
+			let cell = this.getCell(try_coord)
+			if(!cell.attacked){
+				found=true
+			}
+			i+=1
+		}
+		return try_coord
+	}
+
 	onCellClick(e){
 		let cellid = e.target.id
-		if(!this.player.active){
-			let success = this.receiveAttack(cellid)
-			let attackedCell = this.getCell(cellid)
+		if(!this.player.active && this.player.game.state === GAMESTATES.PLAY){
+			let success = this.receiveAttack(cellid.split("-")[1])
+			let attackedCell = this.getCell(cellid.split("-")[1])
 			let didHit = (attackedCell.ship !== null)
 
 			if(!success || !didHit){
@@ -56,7 +86,7 @@ class GameBoard {
 			let try_col = Math.floor(Math.random()*this.size)
 			let try_coord = this.translateRowColToCoord(try_row,try_col)
 			let try_dir = directions[Math.floor(Math.random() * directions.length)]
-			if(this.placeShip(try_coord,try_dir,ships[0],auto=true)){
+			if(this.placeShip(try_coord,try_dir,ships[0],true)){
 				ships.shift()
 			} 
 			count+=1
@@ -300,4 +330,5 @@ class Cell {
 
 
 
-module.exports = GameBoard
+export default GameBoard
+

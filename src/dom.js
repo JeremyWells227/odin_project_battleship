@@ -1,7 +1,6 @@
 const GameBoard = require('./gameboard');
 const Player = require('./player');
-import {Game, GAMESTATES} from "./game.js"
-import {makeModal, closeModal}  from "./modal.js"
+import {Game, GAMESTATES} from "./game.js";
 
 function renderPlayer(player,visible) {
 	let header = document.createElement("h1")
@@ -16,6 +15,8 @@ function renderPlayer(player,visible) {
 	let boardDiv = renderBoard(player.gameboard)
 	playerBox.appendChild(header);
 	playerBox.appendChild(boardDiv);
+	let radiobox = document.createElement("div")
+	let radio_vis  = document.createElement("input")
 
 	return playerBox
 }
@@ -24,7 +25,7 @@ function applyCellStyling(cell,board){
 	cell.classList.remove(...cell.classList)
 	cell.innerText = ""
 	cell.classList.add('cell')
-	let cellobj = board.getCell(cell.id)
+	let cellobj = board.getCell(cell.id.split("-")[1])
 	if (cellobj.attacked && cellobj.ship){
 		cell.classList.add('attacked-filled-cell')
 		cell.innerText = "x"
@@ -53,7 +54,7 @@ function renderBoard(board){
 			if (i>0 && j > 0) {
 				let board_i = i-1
 				let board_j = j-1
-				cell.id = board.translateRowColToCoord(board_j,board_i)
+				cell.id = `${board.player.id}-${board.translateRowColToCoord(board_j,board_i)}`
 
 				applyCellStyling(cell,board)
 				fullboard.appendChild(cell)
@@ -149,7 +150,8 @@ function initPage(game){
 	playArea.classList.add("container")
 	document.body.appendChild(playArea)
 	playArea.appendChild(renderPlayer(game.player1,true));
-	playArea.appendChild(renderPlayer(game.player2,true));
+	game.player2.setCpu(true);
+	playArea.appendChild(renderPlayer(game.player2,false));
 	renderPage(game)
 }
 
